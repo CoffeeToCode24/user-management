@@ -59,12 +59,45 @@ func main() {
 
 	})
 
-	app.Post("/user/update/:id" 
-
-
+	app.Post("/user/update/:id", func(c *fiber.Ctx) error {
+		id, err := c.ParamsInt("id")
+		if err != nil {
+			return c.Status(400).JSON(fiber.Map{"error": "Invalid ID"})
 		}
 
+		var updatedUser User
 
+		if err := c.BodyParser(&updatedUser); err != nil {
+			return c.Status(400).JSON(fiber.Map{"error": "Invalid Input"})
+		}
+
+		for i, user := range users {
+			if user.ID == id {
+				users[i].Name = updatedUser.Name
+				users[i].Age = updatedUser.Age
+				return c.JSON(fiber.Map{"success": "user updated successfully", "user": users[i]})
+			}
+
+		}
+		return c.Status(400).JSON(fiber.Map{"error": "no user found"})
+	})
+
+	app.Delete("/user/delete/:id", func(c *fiber.Ctx) error {
+		id, err := c.ParamsInt("id")
+		if err != nil {
+			return c.Status(400).JSON(fiber.Map{"error": "Invalid ID"})
+		}
+
+		for i, user := range users {
+			if user.ID == id {
+				users = append(users[:i], users[i+1:]...)
+
+				return c.JSON(fiber.Map{"success": "user deleted successfully"})
+			}
+
+		}
+		return c.Status(400).JSON(fiber.Map{"error": "no user found"})
+	})
 
 	app.Listen(":3100")
 }
