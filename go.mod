@@ -1,4 +1,4 @@
-module github.com/swayambhuprasad/user-managemnet
+module github.com/user-managemnet
 
 go 1.23.0
 
